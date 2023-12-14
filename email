@@ -227,7 +227,7 @@ fi
 
 MAILPDF="$MAILFILE.pdf"
 
-_epstopdf_status=$($EpsToPdf $MAILFILE -o $MAILPDF 2>&1)
+_epstopdf_status=$($EpsToPdf $MAILFILE $MAILPDF 2>&1)
 _epstopdf_rc=$?
 
 if [ $_epstopdf_rc -ne 0 ]; then
@@ -241,6 +241,10 @@ _mailx_version=$($Mailx -V)
 if echo $_mailx_version|grep -q "GNU Mailutils"; then
     echo "DEBUG:echo '$MailBody' | $Mailx -n -r '$MailFrom' -s '$MailSubject' -a $MAILPDF $MailTo" 1>&2
     _mailx_status=$(echo "$MailBody" | $Mailx -n -r "$MailFrom" -s "$MailSubject" -a $MAILPDF $MailTo 2>&1)
+    _mailx_rc=$?
+elif echo $_mailx_version|grep -q "s-nail"; then
+    echo "DEBUG:echo s-nail gefunden" 1>&2
+    _mailx_status=$(echo "$MailBody" | USER=lp $Mailx -n -r "$MailFrom" -s "$MailSubject" -a $MAILPDF $MailTo 2>&1)
     _mailx_rc=$?
 else
     echo "DEBUG:echo '$MailBody' | $Mailx -n -r '$MailFrom' -s '$MailSubject' -A $MAILPDF $MailTo" 1>&2
